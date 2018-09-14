@@ -122,11 +122,12 @@ parseVersion x = first (mappend (Text.unpack x) . mappend " -> ") $
   where
     empty'  = ModelVersion 0 <$> (alpha <|> beta <|> exp')
     version = ModelVersion
-        <$> number
+        <$> (numberPatch <|> number)
         <*> (alpha <|> beta <|> sandbox <|> pure Nothing)
 
-    preface = A.takeWhile (/= '_') *> void (A.char '_') <|> pure ()
-    number  = A.takeWhile  (/= 'v') *> A.char 'v' *> A.double
+    preface      = A.takeWhile (/= '_') *> void (A.char '_') <|> pure ()
+    number       = A.takeWhile  (/= 'v') *> A.char 'v' *> A.double
+    numberPatch  = A.takeWhile  (/= 'v') *> A.char 'v' *> A.double *> A.char 'p' *> A.double
 
     alpha = A.string "alpha"
          *> (Alpha <$> optional A.decimal <*> optional A.letter)
